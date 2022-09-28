@@ -7,7 +7,12 @@ public class FieldOfView : MonoBehaviour
     public float viewRadius;
     [Range(0, 360)]
     public float viewAngle;
-    public float meshResolution;
+    [SerializeField]
+    private float _meshResolution;
+    [SerializeField]
+    private int _edgeResolveIteration;
+    [SerializeField]
+    private float _edgeDistanceThreshold;
     [SerializeField]
     private List<Transform> _visibleTargets = new List<Transform>();
     [SerializeField]
@@ -43,14 +48,30 @@ public class FieldOfView : MonoBehaviour
     }
 
     private void DrawFieldOfView() {
-        int stepCount = Mathf.RoundToInt(viewAngle * meshResolution);
+        int stepCount = Mathf.RoundToInt(viewAngle * _meshResolution);
         float stepAngleSize = viewAngle / stepCount;
         List<Vector3> viewPoints = new List<Vector3>();
+        ViewHitInfo viewHitInfoOld = new ViewHitInfo();
 
         for(int i = 0; i <= stepCount; i++) {
             float angle = transform.eulerAngles.y - viewAngle / 2 + stepAngleSize * i;
             ViewHitInfo viewHitInfo = ViewCast(angle);
+
+            if (i > 0) {
+                bool edgeDstThresholdExceeded = Mathf.Abs(viewHitInfoOld.Distance - viewHitInfo.Distance) > _edgeDistanceThreshold;
+                if (viewHitInfoOld.Hit != viewHitInfo.Hit || (viewHitInfoOld.Hit && viewHitInfo.Hit && edgeDstThresholdExceeded)) {
+                    EdgeHitInfo edgeInfo = FindEdge(viewHitInfoOld, viewHitInfo);
+                    if (edgeInfo.PointA != Vector3.zero) {
+                        viewPoints.Add(edgeInfo.PointA);
+                    }
+                    if (edgeInfo.PointB != Vector3.zero) {
+                        viewPoints.Add(edgeInfo.PointB);
+                    }
+                }
+            }
+
             viewPoints.Add(viewHitInfo.Point);
+            viewHitInfoOld = viewHitInfo;
         }
 
         int vertexCount = viewPoints.Count + 1;
@@ -59,7 +80,7 @@ public class FieldOfView : MonoBehaviour
 
         vertices[0] = Vector3.zero;
         for (int i = 0; i < vertexCount - 1; i++) {
-            vertices[i + 1] = transform.InverseTransformPoint(viewPoints[i]);
+            vertices[i + 1] = transform.InverseTransformPoint(viewPoints[i]) + Vector3.forward * _cutDownDistance;
             if (i < vertexCount - 2) {
                 triangles[i * 3] = 0;
                 triangles[i * 3 + 1] = i + 1;
@@ -72,14 +93,37 @@ public class FieldOfView : MonoBehaviour
         _mesh.RecalculateNormals();
     }
 
-    private ViewHitInfo ViewCast(float gloablAngle) {
-        Vector3 dir = DirectionAngle(gloablAngle, true);
+    private EdgeHitInfo FindEdge(ViewHitInfo minViewCast, ViewHitInfo maxViewCast) {
+        float minAngle = minViewCast.Angle;
+        float maxAngle = maxViewCast.Angle;
+        Vector3 minPoint = Vector3.zero;
+        Vector3 maxPoint = Vector3.zero;
+
+        for (int i = 0; i < _edgeResolveIteration; i++)
+        {
+            float angle = (minAngle + maxAngle) / 2;
+            ViewHitInfo newViewCast = ViewCast(angle);
+
+            bool edgeDstThresholdExceeded = Mathf.Abs(minViewCast.Distance - newViewCast.Distance) > _edgeDistanceThreshold;
+            if (newViewCast.Hit == minViewCast.Hit && !edgeDstThresholdExceeded) {
+                minAngle = angle;
+                minPoint = newViewCast.Point;
+            } else {
+                maxAngle = angle;
+                maxPoint = newViewCast.Point;
+            }
+        }
+        return new EdgeHitInfo(minPoint, maxPoint);
+    }
+
+    private ViewHitInfo ViewCast(float globalAngle) {
+        Vector3 dir = DirectionAngle(globalAngle, true);
         RaycastHit hit;
 
         if (Physics.Raycast(transform.position, dir, out hit, viewRadius, _obstacleMask)) {
-            return new ViewHitInfo(hit.point);
+            return new ViewHitInfo(true, hit.point, hit.distance, globalAngle);
         }
-        return new ViewHitInfo(transform.position + dir * viewRadius);
+        return new ViewHitInfo(false, transform.position + dir * viewRadius, hit.distance, globalAngle);
     }
 
     public Vector3 DirectionAngle(float angleInDeg, bool angleIsGlobal) {
