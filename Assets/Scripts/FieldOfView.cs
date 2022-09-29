@@ -18,8 +18,9 @@ public class FieldOfView : MonoBehaviour
     private float _cutDownDistance = 0.2f;
     [SerializeField]
     private MeshFilter _meshFilter;
+    [SerializeField]
+    private LayerMask _targetMask;
     private int _obstacleMask = 1 << 7;
-    private int _playerMask = 1 << 3;
     private Mesh _mesh;
     private void Start() {
         _mesh = new Mesh();
@@ -34,7 +35,7 @@ public class FieldOfView : MonoBehaviour
     }
     private void FindTargetsInAngle() {
         visibleTargets.Clear();
-        Collider[] targetInView = Physics.OverlapSphere(transform.position, viewRadius, _playerMask);
+        Collider[] targetInView = Physics.OverlapSphere(transform.position, viewRadius, _targetMask);
         foreach(Collider target in targetInView) {
             var dir = (target.transform.position - transform.position).normalized;
             if (Vector3.Angle(transform.forward, dir) < viewAngle / 2) {

@@ -202,6 +202,9 @@ MonoBehaviour:
   _edgeDistanceThreshold: 0.5
   _cutDownDistance: 0
   _meshFilter: {fileID: 5520005045485626821}
+  _targetMask:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!95 &5520005046712031928
 Animator:
   serializedVersion: 3
@@ -256,5 +259,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _ground: {fileID: 0}
-  _meshRenderer: {fileID: 5520005045485626820}
-  _awareDuration: 1

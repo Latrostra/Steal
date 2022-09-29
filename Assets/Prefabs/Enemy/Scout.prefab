@@ -122,6 +122,9 @@ MonoBehaviour:
   _edgeDistanceThreshold: 0.5
   _cutDownDistance: 0
   _meshFilter: {fileID: 4528189518895543018}
+  _targetMask:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!95 &4528189517936512407
 Animator:
   serializedVersion: 3
