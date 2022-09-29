@@ -10,14 +10,18 @@ public class Walk : StateMachineBehaviour
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         _nmc = animator.gameObject.GetComponent<NavMeshAgent>();
-        _enemyAi = animator.gameObject.GetComponent<EnemyAi>();
+        _enemyAi = animator.gameObject.GetComponent<IEnemyAi>();
     }
 
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if (_nmc.velocity == Vector3.zero) {
-            _nmc.SetDestination(_enemyAi.CalculatePosition());
+        if (_nmc.velocity != Vector3.zero) {
+            return;
         }
+        if (_enemyAi.IsRotating) {
+            return;
+        }
+        _nmc.SetDestination(_enemyAi.CalculatePosition());
     }
 
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 
-public class EnemyAi : MonoBehaviour, IEnemyAi
+public class WandererAi : MonoBehaviour, IEnemyAi
 {
     [SerializeField]
     private GameObject _ground;
@@ -14,6 +14,12 @@ public class EnemyAi : MonoBehaviour, IEnemyAi
     private float _awareDuration = 5f;
     private RandomPosition _randomPosition;
     private FieldOfView _fieldOfView;
+    public bool IsRotating {get {
+        return false;
+    } 
+    set {
+        IsRotating = value;
+    }}
 
     private void Awake() {
         _randomPosition = new RandomPosition(new List<Vector3>(_ground.GetComponent<MeshFilter>().sharedMesh.vertices), _ground);
