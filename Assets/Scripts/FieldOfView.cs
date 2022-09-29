@@ -7,6 +7,7 @@ public class FieldOfView : MonoBehaviour
     public float viewRadius;
     [Range(0, 360)]
     public float viewAngle;
+    public List<Transform> visibleTargets = new List<Transform>();
     [SerializeField]
     private float _meshResolution;
     [SerializeField]
@@ -14,13 +15,11 @@ public class FieldOfView : MonoBehaviour
     [SerializeField]
     private float _edgeDistanceThreshold;
     [SerializeField]
-    private List<Transform> _visibleTargets = new List<Transform>();
-    [SerializeField]
     private float _cutDownDistance = 0.2f;
     [SerializeField]
     private MeshFilter _meshFilter;
     private int _obstacleMask = 1 << 7;
-    private int _enemyMask = 1 << 6;
+    private int _playerMask = 1 << 3;
     private Mesh _mesh;
     private void Start() {
         _mesh = new Mesh();
@@ -34,14 +33,14 @@ public class FieldOfView : MonoBehaviour
         DrawFieldOfView();
     }
     private void FindTargetsInAngle() {
-        _visibleTargets.Clear();
-        Collider[] targetInView = Physics.OverlapSphere(transform.position, viewRadius, _enemyMask);
+        visibleTargets.Clear();
+        Collider[] targetInView = Physics.OverlapSphere(transform.position, viewRadius, _playerMask);
         foreach(Collider target in targetInView) {
             var dir = (target.transform.position - transform.position).normalized;
             if (Vector3.Angle(transform.forward, dir) < viewAngle / 2) {
                 float dist = Vector3.Distance(target.transform.position, transform.position);
                 if (!Physics.Raycast(transform.position, dir, dist, _obstacleMask)) {
-                    _visibleTargets.Add(target.transform);
+                    visibleTargets.Add(target.transform);
                 }
             }
         }
