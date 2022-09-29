@@ -6,10 +6,10 @@ public class PlayerController : MonoBehaviour
 {
     public float speed = 10f;
     private PlayerAction _input;
-    private Rigidbody _rigibody;
+    private Rigidbody _rigidbody;
     private void Awake() {
         _input = GetComponent<PlayerAction>();
-        _rigibody = GetComponent<Rigidbody>();
+        _rigidbody = GetComponent<Rigidbody>();
     }
 
     private void Update() {
@@ -24,7 +24,15 @@ public class PlayerController : MonoBehaviour
         if (_input.moveVector == Vector2.zero) {
             return;
         }
-        _rigibody.MovePosition(_rigibody.position + new Vector3(_input.moveVector.x, 0, _input.moveVector.y) * speed * Time.fixedDeltaTime);
+        Vector3 direction = (_rigidbody.position + new Vector3(_input.moveVector.x, 0, _input.moveVector.y) - _rigidbody.position).normalized;
+        Ray ray = new Ray(_rigidbody.position, direction);
+        RaycastHit hit;
+        if (!Physics.Raycast(ray,out hit,direction.magnitude)) {
+            _rigidbody.MovePosition(_rigidbody.position + new Vector3(_input.moveVector.x, 0, _input.moveVector.y) * speed * Time.fixedDeltaTime);
+        }
+        else {
+            _rigidbody.MovePosition(hit.point);
+        }
     }
 
     private void RotateToMouse() {

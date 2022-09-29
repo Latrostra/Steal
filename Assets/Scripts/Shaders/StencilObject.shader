@@ -4,12 +4,14 @@ Shader "Custom/StencilObject"
     {
         _Color ("Color", Color) = (1,1,1,1)
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
+        _Normal ("Normal Texture", 2D) = "bump" {}
+        _BumpSlider ("Bump Amount", Range(0,10)) = 1
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
     }
     SubShader
     {
-        Tags { "RenderType"="Fade" }
+        Tags { "RenderType"="Opaque" }
         LOD 200
 
         Stencil {
@@ -29,10 +31,13 @@ Shader "Custom/StencilObject"
         struct Input
         {
             float2 uv_MainTex;
+            float2 uv_NormalTex;
         };
 
         half _Glossiness;
         half _Metallic;
+        sampler2D _Normal;
+        half _BumpSlider;
         fixed4 _Color;
 
         // Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
@@ -48,6 +53,8 @@ Shader "Custom/StencilObject"
             fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
             o.Albedo = c.rgb;
             // Metallic and smoothness come from slider variables
+            o.Normal = UnpackNormal(tex2D(_Normal, IN.uv_NormalTex));
+            o.Normal += float3(_BumpSlider, _BumpSlider, 1);
             o.Metallic = _Metallic;
             o.Smoothness = _Glossiness;
             o.Alpha = c.a;
