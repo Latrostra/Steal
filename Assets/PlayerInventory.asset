@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b916bb109e6133641a884981889b4cd8, type: 3}
   m_Name: PlayerInventory
   m_EditorClassIdentifier: 
-  Endurance: 0
-  ItemWorth: 0
+  MaxEndurance: 3000
+  Endurance: 2500
+  ItemWorth: 3400

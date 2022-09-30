@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour
         Vector3 direction = (_rigidbody.position + new Vector3(_input.moveVector.x, 0, _input.moveVector.y) - _rigidbody.position).normalized;
         Ray ray = new Ray(_rigidbody.position, direction);
         RaycastHit hit;
-        if (!Physics.Raycast(ray,out hit,direction.magnitude - 0.5f)) {
+        if (!Physics.Raycast(ray,out hit,direction.magnitude - 1f)) {
             _rigidbody.MovePosition(_rigidbody.position + new Vector3(_input.moveVector.x, 0, _input.moveVector.y) * speed * Time.fixedDeltaTime);
         }
         else {

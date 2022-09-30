@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b916bb109e6133641a884981889b4cd8, type: 3}
   m_Name: ItemGreen
   m_EditorClassIdentifier: 
-  Endurance: 20
+  MaxEndurance: 0
+  Endurance: 500
   ItemWorth: 200
