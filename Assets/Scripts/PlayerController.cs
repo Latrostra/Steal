@@ -8,11 +8,15 @@ public class PlayerController : MonoBehaviour
     private PlayerAction _input;
     private Rigidbody _rigidbody;
     private FindItem _findItem;
+    [SerializeField]
+    private StateSO state;
 
     private void Awake() {
         _input = GetComponent<PlayerAction>();
         _rigidbody = GetComponent<Rigidbody>();
         _findItem = GetComponent<FindItem>();
+
+        state.IsBusy = false;
 
         _input.onInteraction += InteractHandler;
     }
@@ -30,13 +34,13 @@ public class PlayerController : MonoBehaviour
     }
 
     private void Move() {
-        if (_input.moveVector == Vector2.zero) {
+        if (_input.moveVector == Vector2.zero || state.IsBusy) {
             return;
         }
         Vector3 direction = (_rigidbody.position + new Vector3(_input.moveVector.x, 0, _input.moveVector.y) - _rigidbody.position).normalized;
         Ray ray = new Ray(_rigidbody.position, direction);
         RaycastHit hit;
-        if (!Physics.Raycast(ray,out hit,direction.magnitude)) {
+        if (!Physics.Raycast(ray,out hit,direction.magnitude - 0.5f)) {
             _rigidbody.MovePosition(_rigidbody.position + new Vector3(_input.moveVector.x, 0, _input.moveVector.y) * speed * Time.fixedDeltaTime);
         }
         else {
@@ -45,10 +49,16 @@ public class PlayerController : MonoBehaviour
     }
 
     private void RotateToMouse() {
+        if (state.IsBusy) {
+            return;
+        }
         transform.LookAt(_input.mouseVector + Vector3.up * transform.position.y);
     }
 
     private void InteractHandler() {
+        if (state.IsBusy || _findItem.closestItem == null) {
+            return;
+        }
         _findItem.closestItem.gameObject.GetComponent<IPickable>().Use();
     }
 }
