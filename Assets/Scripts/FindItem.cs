@@ -20,11 +20,16 @@ public class FindItem : MonoBehaviour
         }
         _distance = float.MaxValue;
         foreach (var transform in _fieldOfView.visibleTargets) {
-            
+            if (transform == null) {
+                continue;
+            }
             if (Vector3.Distance(this.transform.position, transform.position) < _distance) {
                 _distance = Vector3.Distance(this.transform.position, transform.position);
                 closestItem = transform;
             }
+        }
+        if (closestItem == null) {
+            return;
         }
         if (Vector3.Distance(this.transform.position, closestItem.position) > _interactableDistance) {
             _distance = float.MaxValue;

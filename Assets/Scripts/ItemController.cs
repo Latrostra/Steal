@@ -17,7 +17,7 @@ public class ItemController : MonoBehaviour
             _meshRenderer.material.SetFloat("_Glossiness", 1f);
             _meshRenderer.material.SetFloat("_Metallic", 1f);
         }
-        else if (_meshRenderer.material.GetFloat("_Metallic") == 1f && _meshRenderer.material.GetFloat("_Glossiness") == 1f) {
+        else if (_meshRenderer.material.GetFloat("_Metallic") == 1f || _meshRenderer.material.GetFloat("_Glossiness") == 1f) {
             _meshRenderer.material.SetFloat("_Glossiness", 0f);
             _meshRenderer.material.SetFloat("_Metallic", 0f);
         }

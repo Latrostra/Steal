@@ -7,9 +7,18 @@ public class PlayerController : MonoBehaviour
     public float speed = 10f;
     private PlayerAction _input;
     private Rigidbody _rigidbody;
+    private FindItem _findItem;
+
     private void Awake() {
         _input = GetComponent<PlayerAction>();
         _rigidbody = GetComponent<Rigidbody>();
+        _findItem = GetComponent<FindItem>();
+
+        _input.onInteraction += InteractHandler;
+    }
+
+    private void OnDestroy() {
+        _input.onInteraction -= InteractHandler;
     }
 
     private void Update() {
@@ -37,5 +46,9 @@ public class PlayerController : MonoBehaviour
 
     private void RotateToMouse() {
         transform.LookAt(_input.mouseVector + Vector3.up * transform.position.y);
+    }
+
+    private void InteractHandler() {
+        _findItem.closestItem.gameObject.GetComponent<IPickable>().Use();
     }
 }
