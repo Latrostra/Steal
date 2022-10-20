@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//Przebuduj to na ItemManager kiedys
 public class ItemController : MonoBehaviour
 {
     private FindItem _findItem;
